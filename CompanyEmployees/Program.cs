@@ -1,4 +1,5 @@
 using CompanyEmployees.Extensions;
+using Contracts;
 using Microsoft.AspNetCore.HttpOverrides;
 using NLog;
 
@@ -13,6 +14,7 @@ builder.Services.ConfigureLoggerService();
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
 builder.Services.CofigureSqlContext(builder.Configuration);
+builder.Services.AddAutoMapper(typeof(Program));
 
 
 builder.Services.AddControllers()
@@ -20,25 +22,25 @@ builder.Services.AddControllers()
 
 var app = builder.Build();
 
+var logger = app.Services.GetRequiredService<ILoggerManager>();
+app.ConfigureExtensionHandler(logger);
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
-else
+//posle uvodjenja ExceptionHandler-a ne treba nam UseDeveloperExceptionPage za situaciju IsDevelopment
+if (app.Environment.IsProduction())
 {
     app.UseHsts();
 }
 
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
+
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.All
 });
 
+app.UseCors("CorsPolicy");
 
 app.UseAuthorization();
 

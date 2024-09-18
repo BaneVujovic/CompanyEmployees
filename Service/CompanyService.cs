@@ -1,4 +1,5 @@
-﻿using Contracts;
+﻿using AutoMapper;
+using Contracts;
 using Entities.Models;
 using Service.Contracts;
 using Shared.DataTransferObject;
@@ -9,25 +10,30 @@ namespace Service
     {
         private readonly IRepositoryManager _repository;
         private readonly ILoggerManager _logger;
+        private readonly IMapper _mapper;
 
-        public CompanyService(IRepositoryManager repository, ILoggerManager logger)
+        public CompanyService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
+            _mapper = mapper;
         }
 
         public IEnumerable<CompanyDto> GetAllCompanies(bool trackChanges) {
-            try
-            {
-                var companies = _repository.Company.GetAllCompanies(trackChanges);
-                var companyDto = companies.Select(c => new CompanyDto(c.Id, c.Name ?? "", string.Join('-', c.Address, c.Country))).ToList();
-                return companyDto;
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError($"Neki je problem na {nameof(GetAllCompanies)} service metodi {ex}.");
-                throw;
-            }
+            var companies = _repository.Company.GetAllCompanies(trackChanges);
+            //var companyDto = companies.Select(c => new CompanyDto(c.Id, c.Name ?? "", string.Join('-', c.Address, c.Country))).ToList();
+            var companyDto = _mapper.Map<IEnumerable<CompanyDto>>(companies);
+            return companyDto;
+        }
+
+        public CompanyDto GetCompany(Guid id, bool trackChanges)
+        {
+            var company = _repository.Company.GetCompany(id, trackChanges);
+            //provjeriti da je lie Company null
+
+            var companyDto = _mapper.Map<CompanyDto>(company);
+
+            return companyDto;
         }
 
     }
