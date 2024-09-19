@@ -1,5 +1,6 @@
 ﻿using Contracts;
 using Entities.Models;
+using Shared.DataTransferObject;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,13 @@ namespace Repository
         : base(repositoryContext)
         {
         }
+
+        public IEnumerable<Employee> GetEmployees(Guid companyId, bool trackChanges) =>
+            FindByCondition(e => e.CompanyId.Equals(companyId), trackChanges)
+            .OrderBy(c => c.Name).ToList();
+
+        public Employee GetEmployee(Guid companyId, Guid employeId, bool trackChanges) =>
+            FindByCondition(c => c.CompanyId.Equals(companyId) && c.Id.Equals(employeId), trackChanges)
+            .SingleOrDefault();
     }
 }
