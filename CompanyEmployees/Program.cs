@@ -23,6 +23,7 @@ builder.Services.AddControllers(config =>
     config.ReturnHttpNotAcceptable = true;
 })
     .AddXmlDataContractSerializerFormatters()
+    .AddCustomCsvFormatter()
     .AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly);
 
 var app = builder.Build();

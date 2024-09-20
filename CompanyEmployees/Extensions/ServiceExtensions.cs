@@ -39,6 +39,11 @@ namespace CompanyEmployees.Extensions
 
         public static void CofigureSqlContext(this IServiceCollection services, IConfiguration configuration)=>
             services.AddDbContext<RepositoryContext>(opt=>opt.UseSqlServer(configuration.GetConnectionString("sqlConnection")));
+
+        public static IMvcBuilder AddCustomCsvFormatter(this IMvcBuilder builder) =>
+            builder.AddMvcOptions(config => config.OutputFormatters.Add(
+                new CsvOutputFormatter()));
+    
     }
 
     public static class ExceptionMiddlewareExtensions
