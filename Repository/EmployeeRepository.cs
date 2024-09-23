@@ -23,5 +23,11 @@ namespace Repository
         public Employee GetEmployee(Guid companyId, Guid employeId, bool trackChanges) =>
             FindByCondition(c => c.CompanyId.Equals(companyId) && c.Id.Equals(employeId), trackChanges)
             .SingleOrDefault();
+
+        public void CreateEmployeeForCompany(Guid companyId, Employee employee)
+        {
+            employee.CompanyId = companyId;
+            Create(employee);
+        }
     }
 }
