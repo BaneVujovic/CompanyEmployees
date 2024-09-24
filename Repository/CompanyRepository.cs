@@ -23,5 +23,9 @@ namespace Repository
         {
             Create(company);
         }
+
+        public IEnumerable<Company> GetByIds(IEnumerable<Guid> companyId, bool trackChanges) =>
+            FindByCondition(c => companyId.Contains(c.Id), trackChanges)
+            .ToList();
     }
 }
