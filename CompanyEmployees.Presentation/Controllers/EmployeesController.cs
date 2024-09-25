@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace CompanyEmployees.Presentation.Controllers
 {
     [Route("api/companies/{companyId}/employees")]
-    [ApiController]
+    //[ApiController]
     public class EmployeesController:ControllerBase
     {
         private readonly IServiceManager _serviceManager;
@@ -52,6 +52,16 @@ namespace CompanyEmployees.Presentation.Controllers
         public IActionResult DeleteEmployeeForCompany(Guid companyId, Guid employeeId)
         {
             _serviceManager.EmployeeService.DeleteEmployeeForCompany(companyId, employeeId, trackChanges: false);
+
+            return NoContent();
+        }
+
+        [HttpPut("{employeeId:guid}")]
+        public IActionResult UpdateEmployeeForCompany(Guid companyId, Guid employeeId, [FromBody]EmployeeForUpdateDto employee)
+        {
+            if (employee is null)
+                return BadRequest("Objekat EmployeeForUpdateDto je Null!");
+            _serviceManager.EmployeeService.UpdateEmployeeForCompany(companyId, employeeId, employee, compTrackChanges: false, empTrackChanges: true);
 
             return NoContent();
         }
