@@ -60,5 +60,12 @@ namespace CompanyEmployees.Presentation.Controllers
             var result = _service.CompanyService.CreateCompanyCollection(companyCollection);
             return CreatedAtRoute("CompanyCollection", new { result.ids }, result.companies);
         }
+
+        [HttpDelete("{id:guid}")]
+        public IActionResult DeleteCompany(Guid companyId)
+        {
+            _service.CompanyService.DeleteCompany(companyId, trackChanges: false);
+            return NoContent();
+        }
     }
 }
