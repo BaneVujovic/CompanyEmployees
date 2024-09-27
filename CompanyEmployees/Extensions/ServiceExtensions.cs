@@ -37,7 +37,7 @@ namespace CompanyEmployees.Extensions
         public static void ConfigureServiceManager(this IServiceCollection service) =>
             service.AddScoped<IServiceManager, ServiceManager>();
 
-        public static void CofigureSqlContext(this IServiceCollection services, IConfiguration configuration)=>
+        public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration)=>
             services.AddDbContext<RepositoryContext>(opt=>opt.UseSqlServer(configuration.GetConnectionString("sqlConnection")));
 
         public static IMvcBuilder AddCustomCsvFormatter(this IMvcBuilder builder) =>
@@ -48,7 +48,7 @@ namespace CompanyEmployees.Extensions
 
     public static class ExceptionMiddlewareExtensions
     {
-        public static void ConfigureExtensionHandler(this WebApplication app, ILoggerManager logger)
+        public static void ConfigureExceptionHandler(this WebApplication app, ILoggerManager logger)
         {
             app.UseExceptionHandler(appError =>
             {
