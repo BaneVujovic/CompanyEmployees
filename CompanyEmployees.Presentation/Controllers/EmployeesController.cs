@@ -35,6 +35,10 @@ namespace CompanyEmployees.Presentation.Controllers
             {
                 return BadRequest("EmployeeForCreationDto objekat je NULL.");
             }
+
+            if (!ModelState.IsValid)
+                return UnprocessableEntity(ModelState);
+
             var employeeToReturn = _serviceManager.EmployeeService.CreateEmployeeForCompany(companyId, employeeForCreation, trackChanges: false);
             return CreatedAtRoute("GetEmployeeForCompany", new
             {
@@ -57,6 +61,10 @@ namespace CompanyEmployees.Presentation.Controllers
         {
             if (employee is null)
                 return BadRequest("Objekat EmployeeForUpdateDto je Null!");
+
+            if (!ModelState.IsValid)
+                return UnprocessableEntity(ModelState);
+
             _serviceManager.EmployeeService.UpdateEmployeeForCompany(companyId, employeeId, employee, compTrackChanges: false, empTrackChanges: true);
 
             return NoContent();
@@ -66,11 +74,17 @@ namespace CompanyEmployees.Presentation.Controllers
         public IActionResult PartiallyUpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] JsonPatchDocument<EmployeeForUpdateDto> patchDoc)
         {
             if (patchDoc is null)
-                return BadRequest("patchDoc object sent from client is null.");
+                return BadRequest("Objekat patchDoc poslat sa klijenta je Null.");
 
             var result = _serviceManager.EmployeeService.GetEmployeeForPatch(companyId, id, compTrackChanges: false, empTrackChanges: true);
 
-            patchDoc.ApplyTo(result.employeeToPatch);
+            patchDoc.ApplyTo(result.employeeToPatch, ModelState);
+
+            TryValidateModel(result.employeeToPatch);
+
+            if (!ModelState.IsValid)
+                return UnprocessableEntity(ModelState);
+
             _serviceManager.EmployeeService.SaveChangesForPatch(result.employeeToPatch, result.employeeEntity);
 
             return NoContent();
