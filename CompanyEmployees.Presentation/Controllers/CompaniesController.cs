@@ -1,4 +1,5 @@
-﻿using CompanyEmployees.Presentation.ModelBinders;
+﻿using CompanyEmployees.Presentation.ActionFilters;
+using CompanyEmployees.Presentation.ModelBinders;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObject;
@@ -32,12 +33,14 @@ namespace CompanyEmployees.Presentation.Controllers
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateCompany([FromBody] CompanyForCreateDto company)
         {
-            if (company == null)
-            {
-                return BadRequest("CompanyForCreateDto je null!");
-            }
+            //Dodavanjem Action filtera za validaciju, nema potrebe za ovim dijelom koda
+            //if (company == null)
+            //{
+            //    return BadRequest("CompanyForCreateDto je null!");
+            //}
 
             var createdCompany = await _service.CompanyService.CreateCompanyAsync(company);
             return CreatedAtRoute("CompanyById", new
@@ -69,10 +72,12 @@ namespace CompanyEmployees.Presentation.Controllers
         }
 
         [HttpPut("{id:guid}")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> UpdateCompany(Guid id, [FromBody]CompanyForUpdateDto company)
         {
-            if (company == null)
-                return BadRequest("Objekat CompanyForUpdateDto je Null!");
+            //Dodavanjem Action filtera za validaciju, nema potrebe za ovim dijelom koda
+            //if (company == null)
+            //    return BadRequest("Objekat CompanyForUpdateDto je Null!");
 
             await _service.CompanyService.UpdateCompanyAsync(id, company, trackChanges: true);
 
