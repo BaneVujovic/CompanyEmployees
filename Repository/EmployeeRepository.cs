@@ -1,5 +1,6 @@
 ﻿using Contracts;
 using Entities.Models;
+using Microsoft.EntityFrameworkCore;
 using Shared.DataTransferObject;
 using System;
 using System.Collections.Generic;
@@ -16,13 +17,13 @@ namespace Repository
         {
         }
 
-        public IEnumerable<Employee> GetEmployees(Guid companyId, bool trackChanges) =>
-            FindByCondition(e => e.CompanyId.Equals(companyId), trackChanges)
-            .OrderBy(c => c.Name).ToList();
+        public async Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, bool trackChanges) =>
+            await FindByCondition(e => e.CompanyId.Equals(companyId), trackChanges)
+            .OrderBy(c => c.Name).ToListAsync();
 
-        public Employee GetEmployee(Guid companyId, Guid employeId, bool trackChanges) =>
-            FindByCondition(c => c.CompanyId.Equals(companyId) && c.Id.Equals(employeId), trackChanges)
-            .SingleOrDefault();
+        public async Task<Employee> GetEmployeeAsync(Guid companyId, Guid employeId, bool trackChanges) =>
+            await FindByCondition(c => c.CompanyId.Equals(companyId) && c.Id.Equals(employeId), trackChanges)
+            .SingleOrDefaultAsync();
 
         public void CreateEmployeeForCompany(Guid companyId, Employee employee)
         {
