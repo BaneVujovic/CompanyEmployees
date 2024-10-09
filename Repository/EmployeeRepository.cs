@@ -1,7 +1,9 @@
 ﻿using Contracts;
 using Entities.Models;
 using Microsoft.EntityFrameworkCore;
+using Repository.Extensions;
 using Shared.DataTransferObject;
+using Shared.RequestFeatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +19,29 @@ namespace Repository
         {
         }
 
-        public async Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, bool trackChanges) =>
-            await FindByCondition(e => e.CompanyId.Equals(companyId), trackChanges)
-            .OrderBy(c => c.Name).ToListAsync();
+        public async Task<PagedList<Employee>> GetEmployeesAsync(Guid companyId, EmployeeParameters employeeParameters, bool trackChanges)
+        {
+            //var employees = 
+            //    await FindByCondition(e => e.CompanyId.Equals(companyId) && (e.Age >= employeeParameters.MinAge && e.Age <= employeeParameters.MaxAge), trackChanges)
+            //    .OrderBy(c => c.Name)
+            //    .Skip((employeeParameters.PageNumber - 1) * employeeParameters.PageSize)
+            //    .Take(employeeParameters.PageSize)
+            //    .ToListAsync();
+
+            var employees =
+                await FindByCondition(e => e.CompanyId.Equals(companyId), trackChanges)
+                .FilterEmployee(employeeParameters.MinAge, employeeParameters.MaxAge)
+                .Search(employeeParameters.SearchTerm)
+                .OrderBy(c => c.Name)
+                .Skip((employeeParameters.PageNumber - 1) * employeeParameters.PageSize)
+                .Take(employeeParameters.PageSize)
+                .ToListAsync();
+
+            var count = await FindByCondition(e => e.CompanyId.Equals(companyId), trackChanges).CountAsync();
+
+            return new PagedList<Employee>(employees, count, employeeParameters.PageNumber, employeeParameters.PageSize);
+        }
+            
 
         public async Task<Employee> GetEmployeeAsync(Guid companyId, Guid employeId, bool trackChanges) =>
             await FindByCondition(c => c.CompanyId.Equals(companyId) && c.Id.Equals(employeId), trackChanges)

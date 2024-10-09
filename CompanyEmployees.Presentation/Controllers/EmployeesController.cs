@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObject;
+using Shared.RequestFeatures;
+using System.Text.Json;
 
 namespace CompanyEmployees.Presentation.Controllers
 {
@@ -13,12 +15,16 @@ namespace CompanyEmployees.Presentation.Controllers
         private readonly IServiceManager _serviceManager;
         public EmployeesController(IServiceManager serviceManager) => _serviceManager = serviceManager;
 
+        //Paging
         [HttpGet]
-        public async Task<IActionResult> GetEmployeesForCompany(Guid companyId)
+        public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery]EmployeeParameters employeeParameters)
         {
-            var employees = await _serviceManager.EmployeeService.GetEmployeesAsync(companyId, trackChanges: false);
+            var pageResult = await _serviceManager.EmployeeService.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
 
-            return Ok(employees);
+            Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pageResult.metaData));
+            //var employees = await _serviceManager.EmployeeService.GetEmployeesAsync(companyId, employeeParameters, trackChanges: false);
+
+            return Ok(pageResult.employees);
         }
 
         [HttpGet("id:guid", Name = "GetEmployeeForCompany")]
@@ -31,23 +37,14 @@ namespace CompanyEmployees.Presentation.Controllers
 
         [HttpPost]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
-        public async Task<IActionResult> CreateEmployeeForCompany(Guid companyId, [FromBody] EmployeeForCreationDto employeeForCreation)
+        public async Task<IActionResult> CreateEmployeeForCompany
+        (Guid companyId, [FromBody] EmployeeForCreationDto employee)
         {
-            //if (employeeForCreation == null)
-            //{
-            //    return BadRequest("EmployeeForCreationDto objekat je NULL.");
-            //}
+            var employeeToReturn = await _serviceManager.EmployeeService.CreateEmployeeForCompanyAsync(companyId, employee,
+                trackChanges: false);
 
-            //if (!ModelState.IsValid)
-            //    return UnprocessableEntity(ModelState);
-
-            var employeeToReturn = await _serviceManager.EmployeeService.CreateEmployeeForCompanyAsync(companyId, employeeForCreation, trackChanges: false);
-            return CreatedAtRoute("GetEmployeeForCompany", new
-            {
-                companyId,
-                id = employeeToReturn.Id
-            }, employeeToReturn);
-
+            return CreatedAtRoute("GetEmployeeForCompany", new { companyId, id = employeeToReturn.Id },
+                employeeToReturn);
         }
 
         [HttpDelete("{id:guid}")]

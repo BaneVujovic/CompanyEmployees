@@ -19,7 +19,8 @@ namespace CompanyEmployees.Extensions
                 options.AddPolicy("CorsPolicy", builder =>
                 builder.AllowAnyOrigin()
                 .AllowAnyMethod()
-                .AllowAnyHeader());
+                .AllowAnyHeader()
+                .WithExposedHeaders("X-Pagination"));
             });
 
         public static void ConfigureIISIntegration(this IServiceCollection services) =>
@@ -37,8 +38,11 @@ namespace CompanyEmployees.Extensions
         public static void ConfigureServiceManager(this IServiceCollection service) =>
             service.AddScoped<IServiceManager, ServiceManager>();
 
-        public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration)=>
-            services.AddDbContext<RepositoryContext>(opt=>opt.UseSqlServer(configuration.GetConnectionString("sqlConnection")));
+        public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration){
+            services.AddDbContext<RepositoryContext>(opt => opt.UseSqlServer(configuration.GetConnectionString("sqlConnection")), ServiceLifetime.Transient);
+            //services.AddDbContext<RepositoryContext>(ServiceLifetime.Transient);
+        }
+            
 
         public static IMvcBuilder AddCustomCsvFormatter(this IMvcBuilder builder) =>
             builder.AddMvcOptions(config => config.OutputFormatters.Add(
