@@ -29,6 +29,8 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 builder.Services.AddScoped<ValidationFilterAttribute>();
 builder.Services.AddScoped<IDataShaper<EmployeeDto>, DataShaper<EmployeeDto>>();
 
+builder.Services.ConfigureVersioning();
+
 builder.Services.AddControllers(config => {
     config.RespectBrowserAcceptHeader = true;
     config.ReturnHttpNotAcceptable = true;
@@ -38,6 +40,8 @@ builder.Services.AddControllers(config => {
   .AddXmlDataContractSerializerFormatters()
   .AddCustomCsvFormatter()
   .AddApplicationPart(typeof(CompanyEmployees.Presentation.AssemblyReference).Assembly);
+
+
 
 var app = builder.Build();
 

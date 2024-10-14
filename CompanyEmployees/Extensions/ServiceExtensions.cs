@@ -8,6 +8,11 @@ using Repository;
 using Service;
 using Service.Contracts;
 using System.Net;
+using System.Reflection;
+using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.Mvc;
+//using Microsoft.AspNetCore.Mvc;
+
 
 namespace CompanyEmployees.Extensions
 {
@@ -47,6 +52,18 @@ namespace CompanyEmployees.Extensions
         public static IMvcBuilder AddCustomCsvFormatter(this IMvcBuilder builder) =>
             builder.AddMvcOptions(config => config.OutputFormatters.Add(
                 new CsvOutputFormatter()));
+
+        public static void ConfigureVersioning(this IServiceCollection services)
+        {
+            services.AddApiVersioning(opt =>
+            {
+                opt.ReportApiVersions = true;
+                opt.AssumeDefaultVersionWhenUnspecified = true;
+                opt.DefaultApiVersion = new ApiVersion(1, 0);
+                //ovaj dio opcije testiramo kroz request Headers dodavanjem parametra Api-Version i broja verzijee koji gadjemo
+                opt.ApiVersionReader = new HeaderApiVersionReader("api-version");
+            });
+        }
     
     }
 

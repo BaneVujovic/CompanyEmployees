@@ -6,11 +6,13 @@ using Shared.DataTransferObject;
 
 namespace CompanyEmployees.Presentation.Controllers
 {
+    //ApiVersion ne radi ako ne postoji atribut [ApiControler]
+    [ApiVersion("1.0")]
     //https://localhost:7154/api/companies
     [Route("api/companies")]
     //Da bi radili nasi (custom) exceptions-i moramo zakomentarisati [ApiController] atribut ->
     //-> koji se okida mnogo ranije nego sto se izvrse neki djelovi koda
-    //[ApiController]
+    [ApiController]
     public class CompaniesController : ControllerBase
     {
         private readonly IServiceManager _service;
@@ -82,6 +84,13 @@ namespace CompanyEmployees.Presentation.Controllers
             await _service.CompanyService.UpdateCompanyAsync(id, company, trackChanges: true);
 
             return NoContent();
+        }
+
+        [HttpOptions]
+        public IActionResult GetCompaniesOptions()
+        {
+            Response.Headers.Add("Allow", "GET, OPTIONS, POST");
+            return Ok();
         }
     }
 }

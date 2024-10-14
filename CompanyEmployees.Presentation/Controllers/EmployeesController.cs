@@ -15,6 +15,7 @@ namespace CompanyEmployees.Presentation.Controllers
         private readonly IServiceManager _serviceManager;
         public EmployeesController(IServiceManager serviceManager) => _serviceManager = serviceManager;
 
+        [HttpHead]
         //Paging
         [HttpGet]
         public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery]EmployeeParameters employeeParameters)
