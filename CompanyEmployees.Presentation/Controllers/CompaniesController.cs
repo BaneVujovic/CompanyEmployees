@@ -7,12 +7,14 @@ using Shared.DataTransferObject;
 namespace CompanyEmployees.Presentation.Controllers
 {
     //ApiVersion ne radi ako ne postoji atribut [ApiControler]
-    [ApiVersion("1.0")]
+    //Mozemo zakomentarisati ApiVersioning jer smo ovu funkcionalnost prosirili u ServiceExtensions klasi
+    //[ApiVersion("1.0")]
     //https://localhost:7154/api/companies
     [Route("api/companies")]
     //Da bi radili nasi (custom) exceptions-i moramo zakomentarisati [ApiController] atribut ->
     //-> koji se okida mnogo ranije nego sto se izvrse neki djelovi koda
     [ApiController]
+    [ResponseCache(CacheProfileName = "120SecondsDuration")]
     public class CompaniesController : ControllerBase
     {
         private readonly IServiceManager _service;
@@ -28,6 +30,7 @@ namespace CompanyEmployees.Presentation.Controllers
         }
 
         [HttpGet("{id:guid}", Name ="CompanyById")]
+        [ResponseCache(Duration = 60)]
         public async Task<IActionResult> GetCompany(Guid id)
         {
             var company = await _service.CompanyService.GetCompanyAsync(id, trackChanges: false);

@@ -7,8 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CompanyEmployees.Presentation.Controllers
-{
-    [ApiVersion("2.0")]
+{   //Mozemo zakomentarisati ApiVersioning jer smo ovu funkcionalnost prosirili u ServiceExtensions klasi
+    //[ApiVersion("2.0", Deprecated = true)]
     [Route("api/companies")]
     [ApiController]
     public class CompaniesV2Controller:ControllerBase

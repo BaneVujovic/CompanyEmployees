@@ -11,6 +11,8 @@ using System.Net;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using CompanyEmployees.Presentation.Controllers;
+using Marvin.Cache.Headers;
 //using Microsoft.AspNetCore.Mvc;
 
 
@@ -62,9 +64,29 @@ namespace CompanyEmployees.Extensions
                 opt.DefaultApiVersion = new ApiVersion(1, 0);
                 //ovaj dio opcije testiramo kroz request Headers dodavanjem parametra Api-Version i broja verzijee koji gadjemo
                 opt.ApiVersionReader = new HeaderApiVersionReader("api-version");
+                //ako imamo vise verzija jednog kontrolera, mozemo te vezije poslagati ovdje u konfiguraciji
+                //sa ovom konfiguracijom mozemo skloniti atribut [ApiVersion]
+                opt.Conventions.Controller<CompaniesController>()
+                .HasApiVersion(new ApiVersion(1, 0));
+                opt.Conventions.Controller<CompaniesV2Controller>()
+                .HasDeprecatedApiVersion(new ApiVersion(2, 0));
             });
         }
-    
+
+        public static void ConfigureResponseCaching(this IServiceCollection services) =>
+            services.AddResponseCaching();
+
+        public static void ConfigureHttpCacheHeaders(this IServiceCollection services) =>
+            services.AddHttpCacheHeaders(
+                (expirationOpt) =>
+                {
+                    expirationOpt.MaxAge = 65;
+                    expirationOpt.CacheLocation = CacheLocation.Private;
+                },
+                (validationOpt) =>
+                {
+                    validationOpt.MustRevalidate = true;
+                });
     }
 
     public static class ExceptionMiddlewareExtensions
