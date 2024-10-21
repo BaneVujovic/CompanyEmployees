@@ -1,5 +1,6 @@
 ﻿using CompanyEmployees.Presentation.ActionFilters;
 using CompanyEmployees.Presentation.ModelBinders;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
 using Shared.DataTransferObject;
@@ -22,6 +23,7 @@ namespace CompanyEmployees.Presentation.Controllers
         public CompaniesController(IServiceManager service) => _service = service;
 
         [HttpGet]
+        [Authorize(Roles ="Manager")]
         public async Task<IActionResult> GetCompanies()
         {
             //throw new Exception("Izuzetak, testiranje!");
