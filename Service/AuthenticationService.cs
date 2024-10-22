@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Contracts;
+using Entities.Exceptions;
 using Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -153,6 +154,20 @@ namespace Service
                 throw new SecurityTokenException("Nevalidan token!");
 
             return principal;
+        }
+
+
+        public async Task<TokenDto> RefreshToken(TokenDto token)
+        {
+            var principal = GetPrincipalFromExpiredTokenn(token.AccessToken);
+
+            //Identity.Name svojstvo je UserName od usera iz db
+            var user = await _userManager.FindByNameAsync(principal.Identity.Name);
+            if (user == null || user.RefreshToken != token.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
+                throw new RefreshTokenBadRequest();
+            _user = user;
+
+            return await CreateToken(populateExp: true);
         }
     }
 }
