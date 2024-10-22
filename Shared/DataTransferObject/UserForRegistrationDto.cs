@@ -19,4 +19,6 @@ namespace Shared.DataTransferObject
         public string? PhoneNumber { get; init; }
         public ICollection<string>? Roles { get; set; }
     }
+
+    public record TokenDto(string AccessToken, string RefreshToken);
 }
