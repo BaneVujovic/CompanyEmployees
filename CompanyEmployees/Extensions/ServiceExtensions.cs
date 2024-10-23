@@ -1,26 +1,24 @@
-﻿using Contracts;
+﻿using AspNetCoreRateLimit;
+using CompanyEmployees.Presentation.Controllers;
+using Contracts;
+using Entities.ConfigurationModel;
 using Entities.ErrorModel;
 using Entities.Exceptions;
+using Entities.Models;
 using LoggerService;
+using Marvin.Cache.Headers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Repository;
 using Service;
 using Service.Contracts;
 using System.Net;
-using System.Reflection;
-using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.AspNetCore.Mvc;
-using CompanyEmployees.Presentation.Controllers;
-using Marvin.Cache.Headers;
-using AspNetCoreRateLimit;
-using Microsoft.AspNetCore.Identity;
-using Entities.Models;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 //using Microsoft.AspNetCore.Mvc;
 
 
@@ -134,7 +132,13 @@ namespace CompanyEmployees.Extensions
 
         public static void ConfigureJWT(this IServiceCollection services, IConfiguration configuration)
         {
-            var jwtSettings = configuration.GetSection("JwtSettings");
+            //koriscenjem GetSection metode, iz IConfiguration interfejsa, citamo vrijednosti iz appsettings fajla
+            //var jwtSettings = configuration.GetSection("JwtSettings");
+
+            //isto kao sa GetSection metodom samo sada preko Bind metode
+            var jwtConfiguration = new JwtConfiguration();
+            configuration.Bind(jwtConfiguration.Section, jwtConfiguration);
+
             var secretKey = Environment.GetEnvironmentVariable("SECRET");
             
 
@@ -153,8 +157,11 @@ namespace CompanyEmployees.Extensions
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
 
-                        ValidIssuer = jwtSettings["validIssuer"],
-                        ValidAudience = jwtSettings["validAudience"],
+                        //ValidIssuer = jwtSettings["validIssuer"],
+                        //ValidAudience = jwtSettings["validAudience"],
+
+                        ValidIssuer = jwtConfiguration.ValidIssuer,
+                        ValidAudience = jwtConfiguration.ValidAudience,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
                     };
                 });
