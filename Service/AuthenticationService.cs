@@ -5,6 +5,7 @@ using Entities.Exceptions;
 using Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Service.Contracts;
 using Shared.DataTransferObject;
@@ -24,18 +25,21 @@ namespace Service
         private readonly ILoggerManager _logger;
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
-        private readonly IConfiguration _configuration;
+        private readonly IOptions<JwtConfiguration> _configuration;
         private User? _user;
         private readonly JwtConfiguration _jwtConfiguration;
 
-        public AuthenticationService(ILoggerManager logger, IMapper mapper, UserManager<User> userManager, IConfiguration configuration)
+        public AuthenticationService(ILoggerManager logger, IMapper mapper, UserManager<User> userManager, IOptions<JwtConfiguration> configuration)
         {
             _logger = logger;
             _mapper = mapper;
             _userManager = userManager;
             _configuration = configuration;
-            _jwtConfiguration = new JwtConfiguration();
-            _configuration.Bind(_jwtConfiguration.Section, _jwtConfiguration);
+            //umjesto IConfiguration interfejsa sada koristimo IOptions<>
+            //_jwtConfiguration = new JwtConfiguration();
+            //_configuration.Bind(_jwtConfiguration.Section, _jwtConfiguration);
+
+            _jwtConfiguration = configuration.Value;
         }
 
         
@@ -109,7 +113,9 @@ namespace Service
 
         private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
         {
-            var jwtSettings = _configuration.GetSection("JwtSettings");
+            //var jwtSettings = _configuration.GetSection("JwtSettings");
+
+            var jwtSettings = _configuration.Value;
 
             var tokenOptions = new JwtSecurityToken
             (
