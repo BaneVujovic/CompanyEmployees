@@ -122,7 +122,7 @@ namespace Service
             await _repository.SaveAsync();
         }
 
-        ApiBaseResponse GetAllCompanies(bool trackChanges)
+        public ApiBaseResponse GetAllCompanies(bool trackChanges)
         {
             var companies = _repository.Company.GetAllCompaniesAsync(trackChanges);
             var companiesDto = _mapper.Map<IEnumerable<CompanyDto>>(companies);
@@ -130,11 +130,11 @@ namespace Service
             return new ApiOkResponse<IEnumerable<CompanyDto>>(companiesDto);
         }
 
-        ApiBaseResponse GetCompany(Guid companyId, bool trackChanges)
+        public ApiBaseResponse GetCompany(Guid companyId, bool trackChanges)
         {
             var company = _repository.Company.GetCompanyAsync(companyId, trackChanges);
             if (company == null)
-                return new CompanyNotFoundException(companyId);
+                return new ApiCompanyNotFoundException(companyId);
             var companyDto = _mapper.Map<CompanyDto>(company);
 
             return new ApiOkResponse<CompanyDto>(companyDto);

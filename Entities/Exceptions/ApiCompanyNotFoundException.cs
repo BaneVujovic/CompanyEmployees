@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Entities.Exceptions
 {
-    public sealed class CompanyNotFoundException : NotFoundException
+    public sealed class ApiCompanyNotFoundException : ApiNotFoundRespose
     {
-        public CompanyNotFoundException(Guid companyId):base($"Kompanija sa ID-em {companyId} ne postoji u DB.")
+        public ApiCompanyNotFoundException(Guid companyId) : base($"Kompanija sa ID-em {companyId} ne postoji u DB.")
         {
-            
+
         }
     }
 }
