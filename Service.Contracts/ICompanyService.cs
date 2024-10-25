@@ -1,4 +1,5 @@
-﻿using Shared.DataTransferObject;
+﻿using Entities.Responses;
+using Shared.DataTransferObject;
 
 namespace Service.Contracts
 {
@@ -11,5 +12,8 @@ namespace Service.Contracts
         Task<(IEnumerable<CompanyDto> companies, string ids)> CreateCompanyCollectionAsync (IEnumerable<CompanyForCreateDto> companyCollection);
         Task DeleteCompanyAsync(Guid companyId, bool trackChanges);
         Task UpdateCompanyAsync(Guid companyid, CompanyForUpdateDto companyForUpdate, bool trackChanges);
+
+        ApiBaseResponse GetAllCompanies(bool trackChanges);
+        ApiBaseResponse GetCompany(Guid companyId, bool trackChanges);
     }
 }

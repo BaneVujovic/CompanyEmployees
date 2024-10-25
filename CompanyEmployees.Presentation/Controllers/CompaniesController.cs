@@ -1,5 +1,7 @@
 ﻿using CompanyEmployees.Presentation.ActionFilters;
+using CompanyEmployees.Presentation.Extensions;
 using CompanyEmployees.Presentation.ModelBinders;
+using Entities.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
@@ -16,7 +18,7 @@ namespace CompanyEmployees.Presentation.Controllers
     //-> koji se okida mnogo ranije nego sto se izvrse neki djelovi koda
     [ApiController]
     [ResponseCache(CacheProfileName = "120SecondsDuration")]
-    public class CompaniesController : ControllerBase
+    public class CompaniesController : ApiControllerBase
     {
         private readonly IServiceManager _service;
 
@@ -27,7 +29,13 @@ namespace CompanyEmployees.Presentation.Controllers
         public async Task<IActionResult> GetCompanies()
         {
             //throw new Exception("Izuzetak, testiranje!");
-            var companies = await _service.CompanyService.GetAllCompaniesAsync(trackChanges: false);
+            //var companies = await _service.CompanyService.GetAllCompaniesAsync(trackChanges: false);
+
+            var baseResult = _service.CompanyService.GetAllCompanies(trackChanges: false);
+            //var companies = ((ApiOkResponse<IEnumerable<CompanyDto>>)baseResult).Result;
+            var companies = baseResult.GetResult<IEnumerable<CompanyDto>>();
+
+
             return Ok(companies);
         }
 
@@ -35,7 +43,15 @@ namespace CompanyEmployees.Presentation.Controllers
         [ResponseCache(Duration = 60)]
         public async Task<IActionResult> GetCompany(Guid id)
         {
-            var company = await _service.CompanyService.GetCompanyAsync(id, trackChanges: false);
+            var baseResult = _service.CompanyService.GetCompany(id, trackChanges: false);
+            if (!baseResult.Success)
+                return ProcessError(baseResult);
+            //var company = await _service.CompanyService.GetCompanyAsync(id, trackChanges: false);
+
+            //var company = ((ApiOkResponse<CompanyDto>)baseResult).Result;
+
+            var company = baseResult.GetResult<CompanyDto>();
+
             return Ok(company);
         }
 
